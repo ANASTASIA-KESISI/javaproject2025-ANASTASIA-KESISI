@@ -23,9 +23,9 @@ public abstract class Fighter extends Entity {
     }
 
     public void attack(Fighter enemy) {
-        int damage = Math.max(0, this.defense - enemy.attack);
+        int damage = Math.abs(enemy.defense - this.attack);
         System.out.println("Damage to " + enemy + " : " + damage );
-        enemy.health = Math.max(1, enemy.health - damage);
+        enemy.health =  enemy.health - damage < 0 ? 0 : enemy.health - damage;
     }
 
     public abstract void takeTurn(char[][] map, Player player, java.util.List<Entity> others);

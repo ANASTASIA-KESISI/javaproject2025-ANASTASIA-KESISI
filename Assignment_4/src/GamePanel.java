@@ -62,8 +62,8 @@ public class GamePanel extends JPanel implements KeyListener {
         entities.add(player);
 
         // Add Knights and Monsters (equal number)
-        //for (int i = 0; i < 3; i++) {
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < (rows * cols)/15; i++) {
+        //for (int i = 0; i < 1; i++) {
             entities.add(new Knight(rand.nextInt(rows), rand.nextInt(cols),
                     rand.nextInt(3) + 1, rand.nextInt(2) + 1));
             entities.add(new Monster(rand.nextInt(rows), rand.nextInt(cols),
@@ -110,6 +110,8 @@ public class GamePanel extends JPanel implements KeyListener {
         for (Entity e : entities)
             if (e instanceof Fighter && !(e instanceof Player))
                 ((Fighter) e).takeTurn(map, player, entities);
+        
+        repaint();
 
         // Combat / Heal
         for (int i = 0; i < entities.size(); i++) {
@@ -140,13 +142,13 @@ public class GamePanel extends JPanel implements KeyListener {
         entities.removeIf(e -> e instanceof Fighter && ((Fighter) e).getHealth() <= 0);
 
         // Check for game over
-        boolean playerAlive = entities.contains(player);
         boolean monstersExist = entities.stream().anyMatch(e -> e instanceof Monster);
+        boolean knightsExist = entities.stream().anyMatch(e -> e instanceof Knight);
 
         System.out.println("*******END OF ROUND********");
 
-        if (!playerAlive || !monstersExist) {
-            String message = !playerAlive ? "You died!" : "You won!";
+        if (!monstersExist || !knightsExist) {
+            String message = !monstersExist && !knightsExist ? "It's a tie!" : !monstersExist && knightsExist ? "Knights won!" : "Monsters won!";
             int result = JOptionPane.showConfirmDialog(this, message + " Play again?", "Game Over", JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
                 restartGame();
@@ -177,7 +179,6 @@ public class GamePanel extends JPanel implements KeyListener {
         if (isFree(newRow, newCol)) {
             player.move(newRow, newCol);
             processTurn();  // One full turn after player moves
-            repaint();
         }
     }
 
