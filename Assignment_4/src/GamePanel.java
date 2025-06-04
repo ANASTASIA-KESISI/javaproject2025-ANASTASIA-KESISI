@@ -64,10 +64,24 @@ public class GamePanel extends JPanel implements KeyListener {
         // Add Knights and Monsters (equal number)
         for (int i = 0; i < (rows * cols)/15; i++) {
         //for (int i = 0; i < 1; i++) {
-            entities.add(new Knight(rand.nextInt(rows), rand.nextInt(cols),
-                    rand.nextInt(3) + 1, rand.nextInt(2) + 1));
-            entities.add(new Monster(rand.nextInt(rows), rand.nextInt(cols),
-                    rand.nextInt(3) + 1, rand.nextInt(2) + 1));
+            entities.add(
+                        new Knight(
+                                    rand.nextInt(rows),
+                                    rand.nextInt(cols),
+                                    rand.nextInt(3) + 1,
+                                    rand.nextInt(2) + 1,
+                                    rand.nextInt(3)
+                        )
+            );
+            entities.add(
+                        new Monster(
+                                    rand.nextInt(rows),
+                                    rand.nextInt(cols),
+                                    rand.nextInt(3) + 1,
+                                    rand.nextInt(2) + 1,
+                                    rand.nextInt(3)
+                        )
+            );
         }
     }
 
@@ -114,7 +128,7 @@ public class GamePanel extends JPanel implements KeyListener {
         repaint();
 
         // Combat / Heal
-        for (int i = 0; i < entities.size(); i++) {
+        /*for (int i = 0; i < entities.size(); i++) {
             for (int j = i + 1; j < entities.size(); j++) {
                 Entity a = entities.get(i), b = entities.get(j);
                 if (a.isAdjacent(b) && a instanceof Fighter fa && b instanceof Fighter fb) {
@@ -131,6 +145,36 @@ public class GamePanel extends JPanel implements KeyListener {
                         System.out.println("defese: " + fb.getDefense());
                         fa.attack(fb);
                         fb.attack(fa);
+                        System.out.println("fa after health: " + fa.getHealth());
+                        System.out.println("fb after health: " + fb.getHealth());
+                    }
+                }
+            }
+        }*/
+
+        for (Entity a : entities) {
+            for (Entity b : entities) {
+                //Entity a = entities.get(i), b = entities.get(j);
+                if(a == b) continue;
+
+                if (a.isAdjacent(b) && a instanceof Fighter fa && b instanceof Fighter fb) {
+                    if (a.isAlly(b)) {
+                        System.out.println(fa + " heals " + fb );
+                        System.out.println(fa.getHealing() );
+                        System.out.println("before:" + fb.getHealth() );
+                        fa.heal(fb);
+                        //fb.heal(fa);
+                        System.out.println("after: " + fb.getHealth() );
+                    } else {
+                        System.out.println(fa + " attacks " + fb );
+                        System.out.println("fa after health: " + fa.getHealth());
+                        System.out.println("fb after health: " + fb.getHealth());
+                        System.out.println("attack: " + fa.getAttack());
+                        System.out.println("defese: " + fa.getDefense());
+                        System.out.println("attack: " + fb.getAttack());
+                        System.out.println("defese: " + fb.getDefense());
+                        fa.attack(fb);
+                        //fb.attack(fa);
                         System.out.println("fa after health: " + fa.getHealth());
                         System.out.println("fb after health: " + fb.getHealth());
                     }

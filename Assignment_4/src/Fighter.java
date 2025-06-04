@@ -1,11 +1,13 @@
 public abstract class Fighter extends Entity {
     protected int attack;  // 1–3
     protected int defense; // 1–2
+    protected int healing; // 0-2
 
-    public Fighter(int row, int col, int attack, int defense) {
+    public Fighter(int row, int col, int attack, int defense, int healing) {
         super(row, col);
         this.attack = attack;
         this.defense = defense;
+        this.healing = healing;
     }
 
     public int getAttack() {
@@ -16,9 +18,14 @@ public abstract class Fighter extends Entity {
         return defense;
     }
 
+    public int getHealing(){
+        return healing;
+    }
+
     public void heal(Fighter ally) {
-        if (ally.health < ally.maxHealth) {
+        if (this.healing > 0 && ally.health < ally.getMaxHealth()) {
             ally.health++;
+            this.healing--;
         }
     }
 

@@ -11,6 +11,7 @@ public abstract class Entity {
     public int getRow() { return row; }
     public int getCol() { return col; }
     public int getHealth() { return health; }
+    public int getMaxHealth() { return maxHealth; }
 
     public void move(int newRow, int newCol) {
         this.row = newRow;

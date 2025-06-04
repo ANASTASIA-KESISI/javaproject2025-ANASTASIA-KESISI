@@ -2,8 +2,8 @@ import java.util.*;
 
 public class Knight extends Fighter {
 
-    public Knight(int row, int col, int attack, int defense) {
-        super(row, col, attack, defense);
+    public Knight(int row, int col, int attack, int defense, int healing) {
+        super(row, col, attack, defense, healing);
     }
 
     @Override
