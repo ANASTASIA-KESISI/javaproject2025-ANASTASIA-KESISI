@@ -30,9 +30,15 @@ public abstract class Fighter extends Entity {
     }
 
     public void attack(Fighter enemy) {
-        int damage = Math.abs(enemy.defense - this.attack);
-        System.out.println("Damage to " + enemy + " : " + damage );
-        enemy.health =  enemy.health - damage < 0 ? 0 : enemy.health - damage;
+        if(enemy.defense <= this.attack){
+            int damage = Math.abs(enemy.defense - this.attack);
+            System.out.println("Damage to " + enemy + " : " + damage );
+            enemy.health =  enemy.health - damage < 0 ? 0 : enemy.health - damage;
+        }
+        else{
+            System.out.println("No attack to " + enemy + " because attack is " + this.attack + " and the enemy defense is: " + enemy.getDefense() );
+        }
+        
     }
 
     public abstract void takeTurn(char[][] map, Player player, java.util.List<Entity> others);

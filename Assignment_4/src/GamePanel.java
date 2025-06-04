@@ -212,6 +212,28 @@ public class GamePanel extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            Object[] options = {"Stats", "Exit"};
+            int choice = JOptionPane.showOptionDialog(
+                this,
+                "Pause Menu",
+                "Game Paused",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]
+            );
+
+            if (choice == 0) {
+                showStats();
+            } else if (choice == 1) {
+                System.exit(0);
+            }
+
+            return;
+        }
+
         int newRow = player.getRow(), newCol = player.getCol();
         switch (e.getKeyCode()) {
             case KeyEvent.VK_UP: newRow--; break;
@@ -229,6 +251,29 @@ public class GamePanel extends JPanel implements KeyListener {
     public void restartGame() {
         generateMap();
         repaint();
+    }
+
+    private void showStats() {
+        StringBuilder stats = new StringBuilder();
+        int knightCount = 0, monsterCount = 0;
+
+        for (Entity e : entities) {
+            if (e instanceof Knight) {
+                knightCount++;
+                stats.append("Knight at (")
+                    .append(e.getRow()).append(", ").append(e.getCol())
+                    .append(") - HP: ").append(((Fighter) e).getHealth()).append("\n");
+            } else if (e instanceof Monster) {
+                monsterCount++;
+                stats.append("Monster at (")
+                    .append(e.getRow()).append(", ").append(e.getCol())
+                    .append(") - HP: ").append(((Fighter) e).getHealth()).append("\n");
+            }
+        }
+
+        stats.insert(0, "Knights: " + knightCount + "\nMonsters: " + monsterCount + "\n\n");
+
+        JOptionPane.showMessageDialog(this, stats.toString(), "Game Stats", JOptionPane.INFORMATION_MESSAGE);
     }
 
 
