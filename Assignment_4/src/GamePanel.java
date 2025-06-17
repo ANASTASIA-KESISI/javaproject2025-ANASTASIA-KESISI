@@ -6,9 +6,10 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
+import javax.swing.Timer;
 
 public class GamePanel extends JPanel implements KeyListener {
-    private final int TILE_SIZE = 40;
+    public static final int TILE_SIZE = 40;
     private int rows, cols;
     private char[][] map;
 
@@ -16,6 +17,11 @@ public class GamePanel extends JPanel implements KeyListener {
     private List<Entity> entities = new ArrayList<>();
 
     private Image landImg, treeImg, riverImg, playerImg, knightImg, monsterImg;
+
+    // Animation system
+    public Timer animationTimer;
+    public List<Animation> activeAnimations = new ArrayList<>();
+    public boolean isAnimating = false;
 
     public GamePanel(int rows, int cols) {
         this.rows = rows;
@@ -25,6 +31,9 @@ public class GamePanel extends JPanel implements KeyListener {
         addKeyListener(this);
         loadImages();
         generateMap();
+
+        // Initialize animation timer
+        animationTimer = new Timer(16, e -> updateAnimations()); // ~60 FPS
     }
 
     private void loadImages() {
@@ -89,6 +98,9 @@ public class GamePanel extends JPanel implements KeyListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
         // Draw map
         for (int r = 0; r < rows; r++)
             for (int c = 0; c < cols; c++) {
@@ -115,6 +127,30 @@ public class GamePanel extends JPanel implements KeyListener {
             g.fillRect(e.getCol() * TILE_SIZE, e.getRow() * TILE_SIZE, 15, 6);
             g.setColor(Color.RED);
             g.fillRect(e.getCol() * TILE_SIZE, e.getRow() * TILE_SIZE, ((Fighter.class.isAssignableFrom(e.getClass())) ? ((Fighter) e).getHealth() * 5 : 0), 6);
+        }
+
+        // Draw animations on top
+        for (Animation animation : activeAnimations) {
+            animation.render(g2d);
+        }
+    }
+
+    private void updateAnimations() {
+        activeAnimations.removeIf(Animation::update);
+        
+        if (activeAnimations.isEmpty() && animationTimer.isRunning()) {
+            animationTimer.stop();
+            isAnimating = false;
+        }
+        
+        repaint();
+    }
+
+    private void addAnimation(Animation animation) {
+        activeAnimations.add(animation);
+        if (!animationTimer.isRunning()) {
+            isAnimating = true;
+            animationTimer.start();
         }
     }
 
@@ -162,6 +198,8 @@ public class GamePanel extends JPanel implements KeyListener {
                         System.out.println(fa + " heals " + fb );
                         System.out.println(fa.getHealing() );
                         System.out.println("before:" + fb.getHealth() );
+                        // Add healing animation
+                        addAnimation(new HealAnimation(fa, fb));
                         fa.heal(fb);
                         //fb.heal(fa);
                         System.out.println("after: " + fb.getHealth() );
@@ -173,6 +211,9 @@ public class GamePanel extends JPanel implements KeyListener {
                         System.out.println("defese: " + fa.getDefense());
                         System.out.println("attack: " + fb.getAttack());
                         System.out.println("defese: " + fb.getDefense());
+
+                        // Add attack animation
+                        addAnimation(new AttackAnimation(fa, fb, TILE_SIZE));
                         fa.attack(fb);
                         //fb.attack(fa);
                         System.out.println("fa after health: " + fa.getHealth());
@@ -249,6 +290,12 @@ public class GamePanel extends JPanel implements KeyListener {
     }
 
     public void restartGame() {
+        // Stop any running animations
+        activeAnimations.clear();
+        if (animationTimer.isRunning()) {
+            animationTimer.stop();
+        }
+        isAnimating = false;
         generateMap();
         repaint();
     }
@@ -279,4 +326,145 @@ public class GamePanel extends JPanel implements KeyListener {
 
     public void keyTyped(KeyEvent e) {}
     public void keyReleased(KeyEvent e) {}
+
+    /*private abstract class Animation {
+        protected int duration;
+        protected int elapsed;
+        protected Entity entity;
+        
+        public Animation(Entity entity, int duration) {
+            this.entity = entity;
+            this.duration = duration;
+            this.elapsed = 0;
+        }
+        
+        public boolean update() {
+            elapsed += 16; // Timer interval
+            return elapsed >= duration;
+        }
+        
+        public abstract void render(Graphics2D g2d);
+        public float getProgress() { return Math.min(1.0f, (float)elapsed / duration); }
+    }
+
+    private class AttackAnimation extends Animation {
+        private Entity target;
+        private float shakeIntensity = 8.0f;
+        
+        public AttackAnimation(Entity attacker, Entity target) {
+            super(attacker, 600); // 600ms animation
+            this.target = target;
+        }
+        
+        @Override
+        public void render(Graphics2D g2d) {
+            float progress = getProgress();
+            
+            // Red flash effect on both entities
+            AlphaComposite originalComposite = (AlphaComposite) g2d.getComposite();
+            float alpha = (float)(0.6 * Math.sin(progress * Math.PI * 6)); // Flashing effect
+            if (alpha > 0) {
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+                g2d.setColor(Color.RED);
+                
+                // Flash on attacker
+                g2d.fillRect(entity.getCol() * TILE_SIZE, entity.getRow() * TILE_SIZE, 
+                           TILE_SIZE, TILE_SIZE);
+                
+                // Flash on target
+                g2d.fillRect(target.getCol() * TILE_SIZE, target.getRow() * TILE_SIZE, 
+                           TILE_SIZE, TILE_SIZE);
+            }
+            g2d.setComposite(originalComposite);
+            
+            // Screen shake effect for target
+            if (progress < 0.5f) {
+                Random rand = new Random((long)(progress * 1000));
+                float shake = shakeIntensity * (1.0f - progress * 2);
+                int shakeX = (int)(rand.nextGaussian() * shake);
+                int shakeY = (int)(rand.nextGaussian() * shake);
+                
+                // Apply shake to target rendering (this would need to be handled in main render)
+                // For now, we'll add impact particles
+                drawImpactParticles(g2d, target, progress);
+            }
+        }
+        
+        private void drawImpactParticles(Graphics2D g2d, Entity target, float progress) {
+            if (progress < 0.3f) {
+                Random rand = new Random((long)(progress * 1000));
+                g2d.setColor(Color.ORANGE);
+                
+                int centerX = target.getCol() * TILE_SIZE + TILE_SIZE / 2;
+                int centerY = target.getRow() * TILE_SIZE + TILE_SIZE / 2;
+                
+                for (int i = 0; i < 8; i++) {
+                    double angle = (Math.PI * 2 * i) / 8.0;
+                    int distance = (int)(15 * progress / 0.3f);
+                    int x = centerX + (int)(Math.cos(angle) * distance);
+                    int y = centerY + (int)(Math.sin(angle) * distance);
+                    g2d.fillOval(x - 2, y - 2, 4, 4);
+                }
+            }
+        }
+    }
+
+    private class HealAnimation extends Animation {
+        public HealAnimation(Entity healer, Entity target) {
+            super(target, 800); // 800ms animation
+        }
+        
+        @Override
+        public void render(Graphics2D g2d) {
+            float progress = getProgress();
+            
+            // Green healing glow
+            AlphaComposite originalComposite = (AlphaComposite) g2d.getComposite();
+            float alpha = (float)(0.4 * Math.sin(progress * Math.PI));
+            
+            if (alpha > 0) {
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+                
+                // Create radial gradient for healing effect
+                int centerX = entity.getCol() * TILE_SIZE + TILE_SIZE / 2;
+                int centerY = entity.getRow() * TILE_SIZE + TILE_SIZE / 2;
+                int radius = (int)(TILE_SIZE * (0.5 + progress * 0.5));
+                
+                RadialGradientPaint gradient = new RadialGradientPaint(
+                    centerX, centerY, radius,
+                    new float[]{0.0f, 1.0f},
+                    new Color[]{new Color(0, 255, 0, 100), new Color(0, 255, 0, 0)}
+                );
+                
+                g2d.setPaint(gradient);
+                g2d.fillOval(centerX - radius, centerY - radius, radius * 2, radius * 2);
+            }
+            
+            g2d.setComposite(originalComposite);
+            
+            // Healing particles floating upward
+            drawHealingParticles(g2d, progress);
+        }
+        
+        private void drawHealingParticles(Graphics2D g2d, float progress) {
+            Random rand = new Random(42); // Fixed seed for consistent particles
+            g2d.setColor(Color.GREEN);
+            
+            int centerX = entity.getCol() * TILE_SIZE + TILE_SIZE / 2;
+            int baseY = entity.getRow() * TILE_SIZE + TILE_SIZE;
+            
+            for (int i = 0; i < 6; i++) {
+                int x = centerX + (int)(rand.nextGaussian() * 10);
+                int y = baseY - (int)(progress * TILE_SIZE * 1.5) + (int)(rand.nextGaussian() * 5);
+                
+                float particleAlpha = 1.0f - progress;
+                if (particleAlpha > 0) {
+                    AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, particleAlpha);
+                    g2d.setComposite(ac);
+                    g2d.fillOval(x - 2, y - 2, 4, 4);
+                    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+                }
+            }
+        }
+    }*/
 }
