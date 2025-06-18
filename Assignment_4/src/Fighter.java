@@ -22,25 +22,28 @@ public abstract class Fighter extends Entity {
         return healing;
     }
 
-    public void heal(Fighter ally) {
+    public Boolean heal(Fighter ally) {
         if (this.healing > 0 && ally.health < ally.getMaxHealth()) {
             ally.health++;
             this.healing--;
+            return true;
         }
+        return false;
     }
 
-    public void attack(Fighter enemy) {
+    public Boolean attack(Fighter enemy) {
         if(enemy.defense <= this.attack){
             int damage = Math.abs(enemy.defense - this.attack);
             System.out.println("Damage to " + enemy + " : " + damage );
             enemy.health =  enemy.health - damage < 0 ? 0 : enemy.health - damage;
+            return true;
         }
-        else{
-            System.out.println("No attack to " + enemy + " because attack is " + this.attack + " and the enemy defense is: " + enemy.getDefense() );
-        }
+        System.out.println("No attack to " + enemy + " because attack is " + this.attack + " and the enemy defense is: " + enemy.getDefense() );
+        return false;
         
     }
 
     public abstract void takeTurn(char[][] map, Player player, java.util.List<Entity> others);
+    public abstract String getEntityInfoAsString();
 }
 

@@ -8,6 +8,9 @@ public class Player extends Entity {
         return other instanceof Knight || other instanceof Player;
     }
 
-    // Movement is handled externally via key input
+    @Override
+    public String getEntityInfoAsString(){
+        return "";
+    }
 }
 

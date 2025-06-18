@@ -19,7 +19,7 @@ public class Monster extends Fighter {
             int newRow = row + d[0];
             int newCol = col + d[1];
 
-            if (isFree(map, newRow, newCol, others)) {
+            if (GamePanel.isFree(map, newRow, newCol, others)) {
                 move(newRow, newCol);
                 break;
             }
@@ -31,12 +31,9 @@ public class Monster extends Fighter {
         return other instanceof Monster;
     }
 
-    private boolean isFree(char[][] map, int r, int c, List<Entity> entities) {
-        if (r < 0 || c < 0 || r >= map.length || c >= map[0].length) return false;
-        for (Entity e : entities)
-            if (e != this && e.getRow() == r && e.getCol() == c)
-                return false;
-        return map[r][c] == '.';
+    public String getEntityInfoAsString(){
+        return "Monster at (" + (this.getCol() + 1) + ", " + (this.getRow() + 1) + ") - HP: " + this.getHealth()+ " - Healings: " + this.getHealing() + "\n";
     }
+    
 }
 

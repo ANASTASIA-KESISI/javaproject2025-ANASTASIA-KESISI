@@ -1,11 +1,9 @@
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.Random;
 
 public class AttackAnimation extends Animation {
         private Entity target;
-        //private float shakeIntensity = 8.0f;
         
         public AttackAnimation(Entity attacker, Entity target, int TILE_SIZE) {
             super(attacker, 600); // 600ms animation
@@ -33,22 +31,14 @@ public class AttackAnimation extends Animation {
             }
             g2d.setComposite(originalComposite);
             
-            // Screen shake effect for target
+            
             if (progress < 0.5f) {
-                //Random rand = new Random((long)(progress * 1000));
-                //float shake = shakeIntensity * (1.0f - progress * 2);
-                //int shakeX = (int)(rand.nextGaussian() * shake);
-                //int shakeY = (int)(rand.nextGaussian() * shake);
-                
-                // Apply shake to target rendering (this would need to be handled in main render)
-                // For now, we'll add impact particles
                 drawImpactParticles(g2d, target, progress);
             }
         }
         
         private void drawImpactParticles(Graphics2D g2d, Entity target, float progress) {
             if (progress < 0.3f) {
-                //Random rand = new Random((long)(progress * 1000));
                 g2d.setColor(Color.ORANGE);
                 
                 int centerX = target.getCol() * GamePanel.TILE_SIZE + GamePanel.TILE_SIZE / 2;

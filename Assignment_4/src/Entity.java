@@ -25,5 +25,6 @@ public abstract class Entity {
     }
 
     public abstract boolean isAlly(Entity other);
+    public abstract String getEntityInfoAsString();
 }
 
