@@ -16,7 +16,7 @@ public class GamePanel extends JPanel implements KeyListener {
     private Player player;
     private List<Entity> entities = new ArrayList<>();
 
-    private Image landImg, treeImg, riverImg, playerImg, knightImg, monsterImg;
+    private Image landImg, treeImg, riverImg, playerImg_left, playerImg_right, knightImg_left, knightImg_right, monsterImg_left, monsterImg_right;
 
     // Animation system
     public Timer animationTimer;
@@ -39,12 +39,30 @@ public class GamePanel extends JPanel implements KeyListener {
 
     private void loadImages() {
         try {
-            landImg = ImageIO.read(new File("resources/land.jpg"));
-            treeImg = ImageIO.read(new File("resources/tree.jpg"));
-            riverImg = ImageIO.read(new File("resources/river.jpg"));
-            playerImg = ImageIO.read(new File("resources/player_left.png"));
-            knightImg = ImageIO.read(new File("resources/knight_left.png"));
-            monsterImg = ImageIO.read(new File("resources/monster_left.png"));
+            if(System.console() != null){
+                //enable this to compile and run manually from terminal
+                landImg = ImageIO.read(new File("land.jpg"));
+                treeImg = ImageIO.read(new File("tree.jpg"));
+                riverImg = ImageIO.read(new File("river.jpg"));
+                playerImg_left = ImageIO.read(new File("player_left.png"));
+                knightImg_left = ImageIO.read(new File("knight_left.png"));
+                monsterImg_left = ImageIO.read(new File("monster_left.png"));
+                playerImg_right = ImageIO.read(new File("player_right.png"));
+                knightImg_right = ImageIO.read(new File("knight_right.png"));
+                monsterImg_right = ImageIO.read(new File("monster_right.png"));
+
+                //enable this to run the game from vs code
+                /*landImg = ImageIO.read(new File("resources/land.jpg"));
+                treeImg = ImageIO.read(new File("resources/tree.jpg"));
+                riverImg = ImageIO.read(new File("resources/river.jpg"));
+                playerImg_left = ImageIO.read(new File("resources/player_left.png"));
+                knightImg_left = ImageIO.read(new File("resources/knight_left.png"));
+                monsterImg_left = ImageIO.read(new File("resources/monster_left.png"));
+                playerImg_right = ImageIO.read(new File("resources/player_right.png"));
+                knightImg_right = ImageIO.read(new File("resources/knight_right.png"));
+                monsterImg_right = ImageIO.read(new File("resources/monster_right.png"));*/
+            }
+            
         } catch (IOException e) {
             System.out.println("Error loading images: " + e.getMessage());
         }
@@ -126,10 +144,14 @@ public class GamePanel extends JPanel implements KeyListener {
         // Draw entities
         for (Entity e : entities) {
             Image img = null;
-            if (e instanceof Player) img = playerImg;
-            else if (e instanceof Knight) img = knightImg;
-            else if (e instanceof Monster) img = monsterImg;
-
+            if (e instanceof Player) {
+                img = e.getDirection() == Direction.LEFT ? playerImg_left : playerImg_right;
+            } else if (e instanceof Knight) {
+                img = e.getDirection() == Direction.LEFT ? knightImg_left : knightImg_right;
+            } else if (e instanceof Monster) {
+                img = e.getDirection() == Direction.LEFT ? monsterImg_left : monsterImg_right;
+            }
+            
             g.drawImage(img, e.getCol() * TILE_SIZE, e.getRow() * TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
             
             // Draw health
@@ -216,6 +238,7 @@ public class GamePanel extends JPanel implements KeyListener {
         System.out.println("*******END OF ROUND********");
 
         if (!monstersExist || !knightsExist) {
+            System.out.println("*******GAME ENDED********");
             String message = !monstersExist && !knightsExist ? "It's a tie!" : !monstersExist && knightsExist ? "Knights won!" : "Monsters won!";
             int result = JOptionPane.showConfirmDialog(this, message + " Play again?", "Game Over", JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {

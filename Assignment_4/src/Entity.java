@@ -1,7 +1,11 @@
+enum Direction {
+    LEFT, RIGHT
+}
 public abstract class Entity {
     protected int row, col;
     protected int health = 3;
     protected final int maxHealth = 3;
+    protected Direction direction = Direction.LEFT; // Default facing left
 
     public Entity(int row, int col) {
         this.row = row;
@@ -12,8 +16,16 @@ public abstract class Entity {
     public int getCol() { return col; }
     public int getHealth() { return health; }
     public int getMaxHealth() { return maxHealth; }
+    public Direction getDirection() { return direction; }
+    public void setDirection(Direction direction) { this.direction = direction; }
 
     public void move(int newRow, int newCol) {
+        if (newCol < col) {
+            direction = Direction.LEFT;
+        } else if (newCol > col) {
+            direction = Direction.RIGHT;
+        }
+
         this.row = newRow;
         this.col = newCol;
     }
