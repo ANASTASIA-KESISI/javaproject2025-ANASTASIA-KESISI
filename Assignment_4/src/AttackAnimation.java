@@ -4,8 +4,7 @@ import java.awt.Graphics2D;
 
 public class AttackAnimation extends Animation {
         private Entity target;
-        
-        public AttackAnimation(Entity attacker, Entity target, int TILE_SIZE) {
+        public AttackAnimation(Entity attacker, Entity target) {
             super(attacker, 600); // 600ms animation
             this.target = target;
         }

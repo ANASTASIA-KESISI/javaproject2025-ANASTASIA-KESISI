@@ -1,7 +1,7 @@
 public abstract class Fighter extends Entity {
-    protected int attack;  // 1–3
-    protected int defense; // 1–2
-    protected int healing; // 0-2
+    protected int attack;  //Range: 1–3
+    protected int defense; //Range: 1–2
+    protected int healing; //Range: 0-2
 
     public Fighter(int row, int col, int attack, int defense, int healing) {
         super(row, col);
@@ -28,6 +28,7 @@ public abstract class Fighter extends Entity {
             this.healing--;
             return true;
         }
+        System.out.println("No heal to " + ally + " because health is at Max ");
         return false;
     }
 
