@@ -30,7 +30,7 @@ public class Monster extends Fighter {
     }
 
     public String getEntityInfoAsString(){
-        return "Monster at (" + (this.getCol() + 1) + ", " + (this.getRow() + 1) + ") - HP: " + this.getHealth()+ " - Healings: " + this.getHealing() + "\n";
+        return "Monster at (" + (this.getRow() + 1) + ", " + (this.getCol() + 1) + ") - HP: " + this.getHealth()+ " - Healings: " + this.getHealing() + "\n";
     }
     
 }

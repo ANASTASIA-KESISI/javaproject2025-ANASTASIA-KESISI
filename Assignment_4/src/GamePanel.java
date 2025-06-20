@@ -186,27 +186,32 @@ public class GamePanel extends JPanel implements KeyListener {
     private void processTurn() {
         System.out.println("*******START OF ROUND********");
         // NPCs move
-        for (Entity e : entities)
-            if (e instanceof Fighter && !(e instanceof Player))
-                if(rand.nextBoolean()){
+        for (Entity e : entities){
+            if (e instanceof Fighter && !(e instanceof Player)){
+                 if(rand.nextBoolean()){
                     System.out.println(e + " decides to play this turn " );
                     ((Fighter) e).takeTurn(map, player, entities);
                 }
                 else{
                     System.out.println(e + " decides to skip this turn " );
                 }
-                
-        
-        repaint();
+            }   
+        }
 
+        System.out.println("------------------------------");  
+                
+        //Display the new positions
+        repaint();
+        
+        //After taking new positions, ready to fight or heal
         for (Entity a : entities) {
             for (Entity b : entities) {
                 if(a == b) continue;
 
                 if (a.isAdjacent(b) && a instanceof Fighter fa && b instanceof Fighter fb) {
-                    //decide randomly if the fighter is going to attack the enemy/heal the ally
-                    if(rand.nextBoolean()) { 
-                        if (a.isAlly(b)) {
+                    if (a.isAlly(b)) {
+                        //decide randomly if the fighter is going to attack the enemy/heal the ally
+                        if(rand.nextBoolean()) { 
                             System.out.println(fa + " heals " + fb );
                             System.out.println(fa + " number of healings: " + fa.getHealing());
                             System.out.println("before:" + fb.getHealth() );
@@ -215,31 +220,31 @@ public class GamePanel extends JPanel implements KeyListener {
                                 addAnimation(new HealAnimation(fa, fb));
                             }
                             System.out.println("after: " + fb.getHealth() );
-                        } else {
-                            System.out.println(fa + " attacks " + fb );
-                            System.out.println(fa + " after health: " + fa.getHealth());
-                            System.out.println(fb + " after health: " + fb.getHealth());
-                            System.out.println("attack: " + fa.getAttack());
-                            System.out.println("defense: " + fa.getDefense());
-                            System.out.println("attack: " + fb.getAttack());
-                            System.out.println("defense: " + fb.getDefense());
-                            if(fa.attack(fb)){
-                                // Add attack animation
-                                addAnimation(new AttackAnimation(fa, fb));
-                            }
-                            System.out.println(fa + " after health: " + fa.getHealth());
-                            System.out.println(fb + " after health: " + fb.getHealth());
+                        } 
+                        else{
+                            System.out.println(fa + " skips heal");
                         }
+                    } else {
+                        System.out.println(fa + " attacks " + fb );
+                        System.out.println(fa + " after health: " + fa.getHealth());
+                        System.out.println(fb + " after health: " + fb.getHealth());
+                        System.out.println(fa + " attack: " + fa.getAttack());
+                        System.out.println(fa + " defence: " + fa.getDefense());
+                        System.out.println(fb + " attack: " + fb.getAttack());
+                        System.out.println(fb + " defence: " + fb.getDefense());
+                        if(fa.attack(fb)){
+                            // Add attack animation
+                            addAnimation(new AttackAnimation(fa, fb));
+                        }
+                        System.out.println(fa + " after health: " + fa.getHealth());
+                        System.out.println(fb + " after health: " + fb.getHealth());
                     }
-                    else{
-                        System.out.println(fa + " skips attack/heal");
-                    }
+                    System.out.println("------------------------------");
                 }
             }
         }
 
-        // Remove dead
-        //entities.removeIf(e -> e instanceof Fighter && ((Fighter) e).getHealth() <= 0);
+        // Remove dead NPCs
         List<Entity> toRemove = new ArrayList<>();
         for (Entity e : entities) {
             if (e instanceof Fighter && ((Fighter) e).getHealth() <= 0) {
@@ -247,6 +252,8 @@ public class GamePanel extends JPanel implements KeyListener {
             }
         }
         entities.removeAll(toRemove);
+
+         System.out.println("*******END OF ROUND********");
 
         // Check for game over
         boolean monstersExist = false;
@@ -264,8 +271,6 @@ public class GamePanel extends JPanel implements KeyListener {
                 break;
             }
         }
-
-        System.out.println("*******END OF ROUND********");
 
         if (!monstersExist || !knightsExist) {
             System.out.println("*******GAME ENDED********");

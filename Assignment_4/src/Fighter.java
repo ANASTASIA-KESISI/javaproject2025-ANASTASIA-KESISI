@@ -33,13 +33,13 @@ public abstract class Fighter extends Entity {
     }
 
     public Boolean attack(Fighter enemy) {
-        if(enemy.defense <= this.attack){
-            int damage = Math.abs(enemy.defense - this.attack);
+        if(enemy.getAttack() <= this.attack){
+            int damage = Math.abs(enemy.getDefense() - this.attack);
             System.out.println("Damage to " + enemy + " : " + damage );
             enemy.health =  enemy.health - damage < 0 ? 0 : enemy.health - damage;
             return true;
         }
-        System.out.println("No attack to " + enemy + " because attack is " + this.attack + " and the enemy defense is: " + enemy.getDefense() );
+        System.out.println("No attack to " + enemy + " because attack is " + this.attack + " and the enemy attack is: " + enemy.getAttack() );
         return false;
         
     }

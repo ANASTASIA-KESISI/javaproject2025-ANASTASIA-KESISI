@@ -30,7 +30,7 @@ public class Knight extends Fighter {
     }
 
     public String getEntityInfoAsString(){
-        return "Knight at (" + (this.getCol() + 1) + ", " + (this.getRow() + 1) + ") - HP: " + this.getHealth()+ " - Healings: " + this.getHealing() + "\n";
+        return "Knight at (" + (this.getRow() + 1) + ", " + (this.getCol() + 1) + ") - HP: " + this.getHealth()+ " - Healings: " + this.getHealing() + "\n";
     }
     
 }
