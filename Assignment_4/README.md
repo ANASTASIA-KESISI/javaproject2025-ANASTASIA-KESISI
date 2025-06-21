@@ -40,5 +40,5 @@ The game ends when one of the 2 teams has no fighers left on the map.
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-Use this space to list resources you find helpful and would like to give credit to. I've included a few of my favorites to kick things off!
+Watch this video for a small preview: https://youtu.be/V4vZoC6HwJY
 
